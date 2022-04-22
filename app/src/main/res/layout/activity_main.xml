@@ -11,11 +11,11 @@
         android:layout_height="0dp"
         tools:ignore="Suspicious0dp" />
 
-    <Button
+    <View
         android:id="@+id/b_capture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:onClick="takePicture"
-        android:text="Capture" />
+        android:background="@color/black"
+        android:onClick="takePicture" />
 
 </LinearLayout>

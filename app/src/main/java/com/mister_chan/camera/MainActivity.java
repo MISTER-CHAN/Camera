@@ -15,7 +15,9 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.ImageReader;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Size;
@@ -29,12 +31,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    static final String OUTPUT_PATH = Environment.getExternalStorageDirectory() + "/DCIM/Camera2/";
+    static final File OUTPUT_FILE = new File(OUTPUT_PATH);
 
     private static final int RC_HANDLE_CAMERA_PERM = 2;
 
@@ -47,12 +54,14 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private static final String[] PERMISSIONS_STORAGE = {
+    private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.CAMERA
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
     };
 
+    private boolean isRecording = false;
     private CameraCaptureSession cameraCaptureSession;
     private CameraDevice cameraDevice;
     private CaptureRequest captureRequest;
@@ -60,8 +69,10 @@ public class MainActivity extends AppCompatActivity {
     private Handler cameraHandler;
     private HandlerThread cameraThread;
     private ImageReader imageReader;
+    private MediaRecorder mediaRecorder;
     private Size captureSize;
     private Size previewSize;
+    private Size videoSize;
     private String cameraId;
     private TextureView textureView;
 
@@ -231,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
         CameraManager cameraManager = (CameraManager) getSystemService(CAMERA_SERVICE);
         try {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, RC_HANDLE_CAMERA_PERM);
+                ActivityCompat.requestPermissions(this, PERMISSIONS, RC_HANDLE_CAMERA_PERM);
                 return;
             }
             cameraManager.openCamera(cameraId, stateCallback, cameraHandler);
@@ -263,6 +274,25 @@ public class MainActivity extends AppCompatActivity {
                 cameraHandler);
     }
 
+    private void setupMediaRecorder() {
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mediaRecorder.setOutputFile(OUTPUT_FILE);
+        mediaRecorder.setVideoEncodingBitRate(100000000);
+        mediaRecorder.setVideoFrameRate(30);
+        mediaRecorder.setVideoSize(videoSize.getWidth(), videoSize.getHeight());
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+        mediaRecorder.setOrientationHint(90);
+        try {
+            mediaRecorder.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void startCameraThread() {
         cameraThread = new HandlerThread("CameraThread");
         cameraThread.start();
@@ -280,6 +310,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    private void stopPreview() {
+        
     }
 
     public void takePicture(View view) {

@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.mister_chan.camera"
-        minSdk 23
+        minSdk 27
         targetSdk 30
         versionCode 1
         versionName "1.0"
