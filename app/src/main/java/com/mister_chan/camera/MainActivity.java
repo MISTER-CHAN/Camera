@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
             CameraCaptureSession.CaptureCallback captureCallback = new CameraCaptureSession.CaptureCallback() {
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
-                    Toast.makeText(getApplicationContext(), "Image Saved!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Success!", Toast.LENGTH_SHORT).show();
                     unlockFocus();
                 }
             };
