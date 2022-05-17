@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
@@ -202,7 +203,6 @@ public class MainActivity extends AppCompatActivity {
         textureView = findViewById(R.id.texture_view);
 
         textureView.setSurfaceTextureListener(surfaceTextureListener);
-
     }
 
     @Override
